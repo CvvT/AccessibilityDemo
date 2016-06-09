@@ -1,58 +1,32 @@
-package com.cwt.accessibilitydemo;
+package com.cwt.accessiblity.sample;
 
 import android.accessibilityservice.AccessibilityService;
-import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
-import android.view.accessibility.AccessibilityRecord;
-
-import java.util.Locale;
 
 /**
- * Created by CwT on 16/6/4.
+ * Created by CwT on 16/6/9.
  */
-public class AccessService extends AccessibilityService implements TextToSpeech.OnInitListener {
+public class Demo2 extends AccessibilityService {
 
     private static final String LOG_TAG = "cc";
     private static final String TEXT_TAG = "text";
     private static final String SEPARATOR = ", ";
     private static final String DASHLINE = "--------------";
 
-    private boolean mTextToSpeechInitialized;
     private boolean mStart = true;
     private boolean mStop = false;
-
-    private TextToSpeech mTts;
-    private AccessibilityNodeInfo mListView = null;
-    private int Total = 0;
-    private int Proceed = 0;
-
-    enum Status {
-        ENABLE,
-        CHECK_BOX,
-        CLICK_BUTTON,
-        DISABLE
-    }
-
-    private Status curStatus = Status.ENABLE;
 
     @Override
     public void onServiceConnected() {
         Log.d(LOG_TAG, "hi!!");
-        mTts = new TextToSpeech(getApplicationContext(), this);
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
 
-//        Log.d(LOG_TAG, event.getPackageName().toString());
         Log.d(LOG_TAG, event.toString());
-
-//        if (!mTextToSpeechInitialized) {
-//            Log.d(LOG_TAG, "Text to Speech is not ready");
-//            return;
-//        }
 
         AccessibilityNodeInfo source = event.getSource();
         if (source == null) {
@@ -63,17 +37,13 @@ public class AccessService extends AccessibilityService implements TextToSpeech.
             return;
 
         if (source.getClassName().toString().equals("android.widget.ListView")) {
-            mListView = source;
-            Total = event.getItemCount();
-            Proceed = event.getCurrentItemIndex();
-            Log.d(LOG_TAG, "Total: " + Total + ", Proceed: " + Proceed + ", Childs: "
-                    + source.getChildCount());
 
             for (int i = 0; i < source.getChildCount(); i++) {
                 final AccessibilityNodeInfo child = source.getChild(i);
                 if (child != null) {
                     Log.d(LOG_TAG, "child " + i + ": " + child.toString());
                     if (child.getClassName().toString().equals("android.widget.LinearLayout")) {
+
                         for (int j = 0; j < child.getChildCount(); j++) {
                             final AccessibilityNodeInfo each = child.getChild(j);
                             if (each != null && each.getText() != null) {
@@ -110,17 +80,7 @@ public class AccessService extends AccessibilityService implements TextToSpeech.
     }
 
     @Override
-    public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
-            mTts.setLanguage(Locale.US);
-            mTextToSpeechInitialized = true;
-        }
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mTextToSpeechInitialized)
-            mTts.shutdown();
     }
 }

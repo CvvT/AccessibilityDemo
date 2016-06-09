@@ -8,6 +8,6 @@
     android:canRetrieveWindowContent="true"
     android:canRequestTouchExplorationMode = "true"
     android:settingsActivity="com.cwt.accessibilitydemo.MainActivity"
-    >
+    android:packageNames="com.android.settings, com.cyanogenmod.filemanager">
 
 </accessibility-service>
